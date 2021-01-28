@@ -5,8 +5,10 @@ class User < ApplicationRecord
                     format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i },
                     uniqueness: { case_sensitive: false }
   has_secure_password
-
   has_many :microposts
+  has_many :favorites
+  has_many :liked_microposts, through: :favorites, source: :micropost
+
   has_many :relationships
   has_many :followings, through: :relationships, source: :follow
   has_many :reverses_of_relationship, class_name: 'Relationship', foreign_key: 'follow_id'
@@ -30,4 +32,19 @@ class User < ApplicationRecord
   def feed_microposts
     Micropost.where(user_id: self.following_ids + [self.id])
   end
+  
+  
+  def like(one_micropost)
+    self.favorites.find_or_create_by(micropost_id: one_micropost.id)
+  end
+
+  def unlike(one_micropost)
+    favorite = self.favorites.find_by(micropost_id: one_micropost.id)
+    favorite.destroy if favorite
+  end
+
+  def like?(one_micropost)
+    self.favorites.include?(one_micropost)
+  end
+  
 end
