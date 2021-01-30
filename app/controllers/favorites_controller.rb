@@ -1,7 +1,6 @@
 class FavoritesController < ApplicationController
   before_action :require_user_logged_in
-  before_action :correct_user, only: [:destroy]
-  
+
   def create
     user = User.find(params[:user_id])
     micropost = Micropost.find(params[:micropost_id])
